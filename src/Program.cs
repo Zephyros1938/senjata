@@ -5,6 +5,8 @@ using Silk.NET.Windowing;
 
 namespace Senjata
 {
+    using Essentials.Components;
+
     class Program
     {
         private static IWindow? window;
@@ -55,15 +57,15 @@ namespace Senjata
 
             // Camera
             var cameraArchetype = scene.GetOrCreateArchetype(
-                typeof(Essentials.Transform3D),
-                typeof(Essentials.Camera),
-                typeof(Essentials.ClientCamera)
+                typeof(Transform3D),
+                typeof(Camera),
+                typeof(ClientCamera)
             );
             var mainCamera = scene.CreateEntity(cameraArchetype);
-            scene.SetComponentData(mainCamera, new Essentials.Transform3D());
+            scene.SetComponentData(mainCamera, new Transform3D());
             scene.SetComponentData(
                 mainCamera,
-                new Essentials.Camera
+                new Camera
                 {
                     Fov = 60f,
                     ViewportSize = new Vector2D<float>(window.Size.X, window.Size.Y),
@@ -71,7 +73,7 @@ namespace Senjata
                     FarPlane = 100f,
                 }
             );
-            scene.SetComponentData(mainCamera, new Essentials.ClientCamera { });
+            scene.SetComponentData(mainCamera, new ClientCamera { });
 
             uint vs = Util.Gl.Shader.CreateShader(
                 gl,
@@ -85,10 +87,10 @@ namespace Senjata
             );
             uint pr = Util.Gl.Shader.CreateProgram(gl, [vs, fs]);
 
-            var shaderArchetype = scene.GetOrCreateArchetype(typeof(Essentials.ShaderProgram));
+            var shaderArchetype = scene.GetOrCreateArchetype(typeof(ShaderProgram));
             var shadpr = scene.CreateEntity(shaderArchetype);
 
-            scene.SetComponentData(shadpr, new Essentials.ShaderProgram { Program = pr });
+            scene.SetComponentData(shadpr, new ShaderProgram { Program = pr });
 
             uint vao = Util.Gl.Shader.GenVAO(
                 gl,
@@ -130,13 +132,10 @@ namespace Senjata
                 ]
             );
 
-            var renderableArchetype = scene.GetOrCreateArchetype(typeof(Essentials.Renderable));
+            var renderableArchetype = scene.GetOrCreateArchetype(typeof(Renderable));
             var renderable = scene.CreateEntity(renderableArchetype);
 
-            scene.SetComponentData(
-                renderable,
-                new Essentials.Renderable { VAO = vao, RenderCount = 3 }
-            );
+            scene.SetComponentData(renderable, new Renderable { VAO = vao, RenderCount = 3 });
 
             double loadTimes = loadTime.GetTime();
             if (Debug.debugTimes)
@@ -158,12 +157,12 @@ namespace Senjata
             if (keyboardManager.IsDown(Key.Number1))
             {
                 var ClientCamera = scene.Query(
-                    typeof(Essentials.Transform3D),
-                    typeof(Essentials.Camera),
-                    typeof(Essentials.ClientCamera)
+                    typeof(Transform3D),
+                    typeof(Camera),
+                    typeof(ClientCamera)
                 )[0];
                 Console.WriteLine(
-                    $"Camera Pos: {ClientCamera.GetStorage<Essentials.Transform3D>()?[0].Position}"
+                    $"Camera Pos: {ClientCamera.GetStorage<Transform3D>()?[0].Position}"
                 );
             }
         }
@@ -172,10 +171,10 @@ namespace Senjata
         {
             gl?.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            var shaderGroups = scene.Query(typeof(Essentials.ShaderProgram));
+            var shaderGroups = scene.Query(typeof(ShaderProgram));
             foreach (var archetype in shaderGroups)
             {
-                var shaders = archetype.GetStorage<Essentials.ShaderProgram>();
+                var shaders = archetype.GetStorage<ShaderProgram>();
                 if (archetype.Entities.Count > 0)
                 {
                     gl.UseProgram(shaders[0].Program);

@@ -2,6 +2,8 @@ using Silk.NET.Maths;
 
 namespace Senjata.Essentials
 {
+    using Components;
+
     public static class Systems
     {
         public static void UpdateCameras(ECS.Scene scene)
