@@ -71,7 +71,7 @@ namespace Senjata.Util.Gl
 
             gl.BindBuffer(GLEnum.ArrayBuffer, VBO);
 
-            gl.BufferData<float>(
+            gl.BufferData(
                 GLEnum.ArrayBuffer,
                 (UIntPtr)(vertices.Length * sizeof(float)),
                 in vertices[0],
@@ -93,6 +93,7 @@ namespace Senjata.Util.Gl
             public uint index;
             public int size;
             public uint stride;
+            public uint offset;
         }
 
         internal static void SetVertexAttrib(GL gl, VertexAttrib attrib)
@@ -102,8 +103,8 @@ namespace Senjata.Util.Gl
                 attrib.size,
                 GLEnum.Float,
                 false,
-                (uint)(attrib.stride * sizeof(float)),
-                IntPtr.Zero
+                attrib.stride * sizeof(float),
+                new IntPtr(attrib.offset * sizeof(float))
             );
             gl.EnableVertexAttribArray(attrib.index);
         }

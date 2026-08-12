@@ -76,12 +76,12 @@ namespace Senjata
             uint vs = Util.Gl.Shader.CreateShader(
                 gl,
                 GLEnum.VertexShader,
-                Util.Gl.Templates.vertexShaderTemplate
+                Util.FsUtil.GetFileText("./assets/shaders/tests/vs0.vert")
             );
             uint fs = Util.Gl.Shader.CreateShader(
                 gl,
                 GLEnum.FragmentShader,
-                Util.Gl.Templates.fragmentShaderTemplate
+                Util.FsUtil.GetFileText("./assets/shaders/tests/fs0.frag")
             );
             uint pr = Util.Gl.Shader.CreateProgram(gl, [vs, fs]);
 
@@ -92,13 +92,40 @@ namespace Senjata
 
             uint vao = Util.Gl.Shader.GenVAO(
                 gl,
-                [-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f],
+                [
+                    -0.5f,
+                    -0.5f,
+                    0.0f,
+                    1.0f,
+                    0.0f,
+                    0.0f, // v1
+                    0.5f,
+                    -0.5f,
+                    0.0f,
+                    0.0f,
+                    1.0f,
+                    0.0f, // v2
+                    0.0f,
+                    0.5f,
+                    0.0f,
+                    0.0f,
+                    0.0f,
+                    1.0f, // v3
+                ],
                 [
                     new Util.Gl.Shader.VertexAttrib
                     {
                         index = 0,
                         size = 3,
-                        stride = 3,
+                        stride = 6,
+                        offset = 0,
+                    },
+                    new Util.Gl.Shader.VertexAttrib
+                    {
+                        index = 1,
+                        size = 3,
+                        stride = 6,
+                        offset = 3,
                     },
                 ]
             );
