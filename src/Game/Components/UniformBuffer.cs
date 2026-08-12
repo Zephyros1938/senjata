@@ -1,0 +1,55 @@
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using Senjata.ECS;
+using Silk.NET.OpenGL;
+
+namespace Senjata.Essentials.Components
+{
+    public struct UniformBuffer(uint handle, uint bindingPoint, nuint sizeInBytes) : IComponent
+    {
+        public uint Handle = handle;
+        public uint BindingPoint = bindingPoint;
+        public nuint SizeInBytes = sizeInBytes;
+
+        static UniformBuffer Create<T>(
+            GL gl,
+            uint bindingPoint,
+            BufferUsageARB usage = BufferUsageARB.DynamicDraw
+        )
+            where T : unmanaged
+        {
+            uint handle = gl.GenBuffer();
+            nuint size = (nuint)Unsafe.SizeOf<T>();
+
+            gl.BindBuffer(BufferTargetARB.UniformBuffer, handle);
+            gl.BufferData(BufferTargetARB.UniformBuffer, size, in nint.Zero, usage);
+            gl.BindBufferBase(BufferTargetARB.UniformBuffer, bindingPoint, handle);
+            gl.BindBuffer(BufferTargetARB.UniformBuffer, 0);
+
+            return new UniformBuffer(handle, bindingPoint, size);
+        }
+    }
+
+    public static class UniformBufferExtensions
+    {
+        public static void UpdateData<T>(this UniformBuffer ubo, GL gl, ref readonly T data)
+            where T : unmanaged
+        {
+            if ((nuint)Unsafe.SizeOf<T>() > ubo.SizeInBytes)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(data),
+                    $"Data size ({Unsafe.SizeOf<T>()} bytes) exceeds buffer capacity ({ubo.SizeInBytes} bytes)."
+                );
+            }
+
+            ReadOnlySpan<T> span = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.AsRef(in data), 1);
+
+            gl.BindBuffer(BufferTargetARB.UniformBuffer, ubo.Handle);
+
+            gl.BufferSubData(BufferTargetARB.UniformBuffer, 0, span);
+
+            gl.BindBuffer(BufferTargetARB.UniformBuffer, 0);
+        }
+    }
+}
