@@ -11,7 +11,7 @@ namespace Senjata.Essentials.Components
         public uint BindingPoint = bindingPoint;
         public nuint SizeInBytes = sizeInBytes;
 
-        static UniformBuffer Create<T>(
+        public static UniformBuffer Create<T>(
             GL gl,
             uint bindingPoint,
             BufferUsageARB usage = BufferUsageARB.DynamicDraw
@@ -22,7 +22,7 @@ namespace Senjata.Essentials.Components
             nuint size = (nuint)Unsafe.SizeOf<T>();
 
             gl.BindBuffer(BufferTargetARB.UniformBuffer, handle);
-            gl.BufferData(BufferTargetARB.UniformBuffer, size, in nint.Zero, usage);
+            gl.BufferData(BufferTargetARB.UniformBuffer, size, Span<byte>.Empty, usage);
             gl.BindBufferBase(BufferTargetARB.UniformBuffer, bindingPoint, handle);
             gl.BindBuffer(BufferTargetARB.UniformBuffer, 0);
 
@@ -32,7 +32,12 @@ namespace Senjata.Essentials.Components
 
     public static class UniformBufferExtensions
     {
-        public static void UpdateData<T>(this UniformBuffer ubo, GL gl, ref readonly T data)
+        public static void UpdateData<T>(
+            this UniformBuffer ubo,
+            GL gl,
+            ref readonly T data,
+            nint offset = 0
+        )
             where T : unmanaged
         {
             if ((nuint)Unsafe.SizeOf<T>() > ubo.SizeInBytes)
@@ -47,9 +52,19 @@ namespace Senjata.Essentials.Components
 
             gl.BindBuffer(BufferTargetARB.UniformBuffer, ubo.Handle);
 
-            gl.BufferSubData(BufferTargetARB.UniformBuffer, 0, span);
+            gl.BufferSubData(BufferTargetARB.UniformBuffer, offset, span);
 
             gl.BindBuffer(BufferTargetARB.UniformBuffer, 0);
         }
+    }
+
+    public enum UniformBufferType
+    {
+        CAMERA = 1,
+    }
+
+    public struct UniformBufferIdent(UniformBufferType ident) : IComponent
+    {
+        public UniformBufferType Ident = ident;
     }
 }

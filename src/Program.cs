@@ -62,15 +62,25 @@ namespace Senjata
                 typeof(ClientCamera)
             );
             var mainCamera = scene.CreateEntity(cameraArchetype);
-            scene.SetComponentData(mainCamera, new Transform3D());
+            var a = new Transform3D();
+            a.Position.Z = 1;
+            scene.SetComponentData(mainCamera, a);
+            float aspectRatio = (float)window.Size.X / window.Size.Y;
+            float fovRadians = Scalar.DegreesToRadians(100f);
             scene.SetComponentData(
                 mainCamera,
                 new Camera
                 {
-                    Fov = 60f,
+                    Fov = 100f,
                     ViewportSize = new Vector2D<float>(window.Size.X, window.Size.Y),
                     NearPlane = 0.1f,
                     FarPlane = 100f,
+                    ProjectionMatrix = Matrix4X4.CreatePerspectiveFieldOfView(
+                        fovRadians,
+                        aspectRatio,
+                        0.1f,
+                        100f
+                    ),
                 }
             );
             scene.SetComponentData(mainCamera, new ClientCamera { });
@@ -137,6 +147,23 @@ namespace Senjata
 
             scene.SetComponentData(renderable, new Renderable { VAO = vao, RenderCount = 3 });
 
+            {
+                var UniformBufferArchetype = scene.GetOrCreateArchetype(
+                    typeof(UniformBuffer),
+                    typeof(UniformBufferIdent)
+                );
+                var UniformBufferEntity = scene.CreateEntity(UniformBufferArchetype);
+
+                scene.SetComponentData(
+                    UniformBufferEntity,
+                    UniformBuffer.Create<Essentials.Uniform.CameraUBO>(gl, 0)
+                );
+                scene.SetComponentData(
+                    UniformBufferEntity,
+                    new UniformBufferIdent { Ident = UniformBufferType.CAMERA }
+                );
+            }
+
             double loadTimes = loadTime.GetTime();
             if (Debug.debugTimes)
             {
@@ -147,23 +174,41 @@ namespace Senjata
         private static void OnUpdate(double deltaTime)
         {
             keyboardManager.Update();
-            Essentials.Systems.UpdateCameras(scene);
+            Essentials.Systems.UpdateCameras(scene, gl);
 
             if (keyboardManager.IsHeld(Key.Escape))
             {
                 window.Close();
             }
 
+            var ClientCamera = scene.Query(
+                typeof(Transform3D),
+                typeof(Camera),
+                typeof(ClientCamera)
+            )[0];
+
             if (keyboardManager.IsDown(Key.Number1))
             {
-                var ClientCamera = scene.Query(
-                    typeof(Transform3D),
-                    typeof(Camera),
-                    typeof(ClientCamera)
-                )[0];
                 Console.WriteLine(
                     $"Camera Pos: {ClientCamera.GetStorage<Transform3D>()?[0].Position}"
                 );
+            }
+
+            if (keyboardManager.IsHeld(Key.S))
+            {
+                ClientCamera.GetStorage<Transform3D>()?[0].Position.Z += 1 * (float)deltaTime;
+            }
+            if (keyboardManager.IsHeld(Key.W))
+            {
+                ClientCamera.GetStorage<Transform3D>()?[0].Position.Z -= 1 * (float)deltaTime;
+            }
+            if (keyboardManager.IsHeld(Key.A))
+            {
+                ClientCamera.GetStorage<Transform3D>()?[0].Position.X -= 1 * (float)deltaTime;
+            }
+            if (keyboardManager.IsHeld(Key.D))
+            {
+                ClientCamera.GetStorage<Transform3D>()?[0].Position.X += 1 * (float)deltaTime;
             }
         }
 
