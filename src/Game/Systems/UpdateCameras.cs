@@ -21,10 +21,10 @@ namespace Senjata.Essentials
 
             foreach (var archetype in uboGroups)
             {
-                UniformBufferIdent ident = archetype.GetStorage<UniformBufferIdent>()[0];
+                UniformBufferIdent ident = archetype.GetStorage<UniformBufferIdent>()![0];
                 if (ident.Ident == UniformBufferType.CAMERA)
                 {
-                    cameraUbo = archetype.GetStorage<UniformBuffer>()[0];
+                    cameraUbo = archetype.GetStorage<UniformBuffer>()![0];
                     break;
                 }
             }
@@ -33,8 +33,8 @@ namespace Senjata.Essentials
 
             foreach (var archetype in cameraGroups)
             {
-                Transform3D transform = archetype.GetStorage<Transform3D>()[0];
-                Camera camera = archetype.GetStorage<Camera>()[0];
+                Transform3D transform = archetype.GetStorage<Transform3D>()![0];
+                Camera camera = archetype.GetStorage<Camera>()![0];
 
                 Matrix4X4<float> rx = Matrix4X4.CreateRotationX(transform.Rotation.X);
                 Matrix4X4<float> ry = Matrix4X4.CreateRotationY(transform.Rotation.Y);
@@ -52,7 +52,11 @@ namespace Senjata.Essentials
                     cameraUbo?.UpdateData(gl, in view, 0);
                 }
 
-                cameraUbo?.UpdateData(gl, in camera.ProjectionMatrix, 64);
+                if (camera.ProjectionMatrixDirty)
+                {
+                    camera.UpdateProjectionMatrix();
+                    cameraUbo?.UpdateData(gl, in camera.ProjectionMatrix, 64);
+                }
             }
         }
     }

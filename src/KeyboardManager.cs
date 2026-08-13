@@ -2,12 +2,12 @@ using Silk.NET.Input;
 
 namespace Senjata
 {
-    class KeyboardManager
+    public class KeyboardManager
     {
-        private readonly HashSet<Key> _rawCurrentKeys = new HashSet<Key>();
+        private readonly HashSet<Key> _rawCurrentKeys = [];
 
-        private readonly HashSet<Key> _currentKeys = new HashSet<Key>();
-        private readonly HashSet<Key> _previousKeys = new HashSet<Key>();
+        private readonly HashSet<Key> _currentKeys = [];
+        private readonly HashSet<Key> _previousKeys = [];
 
         public void OnKeyDown(IKeyboard kb, Key k, int kc)
         {

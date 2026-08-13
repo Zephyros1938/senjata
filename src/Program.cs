@@ -181,52 +181,11 @@ namespace Senjata
                 window.Close();
             }
 
-            var ClientCamera = scene.Query(
-                typeof(Transform3D),
-                typeof(Camera),
-                typeof(ClientCamera)
-            )[0];
-
-            if (keyboardManager.IsDown(Key.Number1))
-            {
-                Console.WriteLine(
-                    $"Camera Pos: {ClientCamera.GetStorage<Transform3D>()?[0].Position}"
-                );
-            }
-
-            if (keyboardManager.IsHeld(Key.S))
-            {
-                ClientCamera.GetStorage<Transform3D>()?[0].Position.Z += 1 * (float)deltaTime;
-            }
-            if (keyboardManager.IsHeld(Key.W))
-            {
-                ClientCamera.GetStorage<Transform3D>()?[0].Position.Z -= 1 * (float)deltaTime;
-            }
-            if (keyboardManager.IsHeld(Key.A))
-            {
-                ClientCamera.GetStorage<Transform3D>()?[0].Position.X -= 1 * (float)deltaTime;
-            }
-            if (keyboardManager.IsHeld(Key.D))
-            {
-                ClientCamera.GetStorage<Transform3D>()?[0].Position.X += 1 * (float)deltaTime;
-            }
+            Essentials.Systems.ProcessKeyboard(scene, keyboardManager, deltaTime);
         }
 
-        private static unsafe void OnRender(double deltaTime)
+        private static void OnRender(double deltaTime)
         {
-            gl?.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-            var shaderGroups = scene.Query(typeof(ShaderProgram));
-            foreach (var archetype in shaderGroups)
-            {
-                var shaders = archetype.GetStorage<ShaderProgram>();
-                if (archetype.Entities.Count > 0)
-                {
-                    gl.UseProgram(shaders[0].Program);
-                    break;
-                }
-            }
-
             Essentials.Systems.RenderScene(scene, gl);
         }
 
