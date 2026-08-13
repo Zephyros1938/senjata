@@ -71,7 +71,7 @@ namespace Senjata
                 mainCamera,
                 new Camera
                 {
-                    Fov = 100f,
+                    Fov = fovRadians,
                     ViewportSize = new Vector2D<float>(window.Size.X, window.Size.Y),
                     NearPlane = 0.1f,
                     FarPlane = 100f,
@@ -81,6 +81,7 @@ namespace Senjata
                         0.1f,
                         100f
                     ),
+                    ProjectionMatrixDirty = true,
                 }
             );
             scene.SetComponentData(mainCamera, new ClientCamera { });
@@ -167,7 +168,7 @@ namespace Senjata
             double loadTimes = loadTime.GetTime();
             if (Debug.debugTimes)
             {
-                Console.WriteLine($"Load took {loadTimes} ms");
+                Console.WriteLine($"Senjata::Program::OnLoad() took {loadTimes} ms");
             }
         }
 

@@ -12,44 +12,44 @@ namespace Senjata.Essentials
             double deltaTime
         )
         {
-            var ClientCamera = scene.Query(
+            var cameraArchetypes = scene.Query(
                 typeof(Transform3D),
                 typeof(Camera),
                 typeof(ClientCamera)
-            )[0];
+            );
+            if (cameraArchetypes.Count == 0)
+                return;
 
-            if (keyboardManager.IsDown(Key.Number1))
-            {
-                Console.WriteLine(
-                    $"Camera Pos: {ClientCamera.GetStorage<Transform3D>()?[0].Position}"
-                );
-            }
+            var archetype = cameraArchetypes[0];
+            Span<Transform3D> transforms = archetype.GetStorage<Transform3D>();
+            Span<Camera> cameras = archetype.GetStorage<Camera>();
+
+            if (transforms.IsEmpty || cameras.IsEmpty)
+                return;
+
+            ref Transform3D transform = ref transforms[0];
+            ref Camera camera = ref cameras[0];
+
+            float speed = 2.0f * (float)deltaTime;
 
             if (keyboardManager.IsHeld(Key.S))
-            {
-                ClientCamera.GetStorage<Transform3D>()?[0].Position.Z += 1 * (float)deltaTime;
-            }
+                transform.Position.Z += speed;
             if (keyboardManager.IsHeld(Key.W))
-            {
-                ClientCamera.GetStorage<Transform3D>()?[0].Position.Z -= 1 * (float)deltaTime;
-            }
+                transform.Position.Z -= speed;
             if (keyboardManager.IsHeld(Key.A))
-            {
-                ClientCamera.GetStorage<Transform3D>()?[0].Position.X -= 1 * (float)deltaTime;
-            }
+                transform.Position.X -= speed;
             if (keyboardManager.IsHeld(Key.D))
-            {
-                ClientCamera.GetStorage<Transform3D>()?[0].Position.X += 1 * (float)deltaTime;
-            }
+                transform.Position.X += speed;
+
             if (keyboardManager.IsHeld(Key.I))
             {
-                ClientCamera.GetStorage<Camera>()![0].Fov -= 1 * (float)deltaTime;
-                ClientCamera.GetStorage<Camera>()![0].ProjectionMatrixDirty = true;
+                camera.Fov -= 1.0f * (float)deltaTime;
+                camera.ProjectionMatrixDirty = true;
             }
             if (keyboardManager.IsHeld(Key.O))
             {
-                ClientCamera.GetStorage<Camera>()![0].Fov += 1 * (float)deltaTime;
-                ClientCamera.GetStorage<Camera>()![0].ProjectionMatrixDirty = true;
+                camera.Fov += 1.0f * (float)deltaTime;
+                camera.ProjectionMatrixDirty = true;
             }
         }
     }

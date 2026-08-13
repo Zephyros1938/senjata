@@ -1,3 +1,0 @@
-Implement 3D
-
-Work on general game engine

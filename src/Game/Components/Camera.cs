@@ -16,13 +16,13 @@ namespace Senjata.Essentials.Components
         public Matrix4X4<float> ProjectionMatrix;
         public bool ProjectionMatrixDirty;
 
-        public void UpdateProjectionMatrix() //TODO: make this its own system to follow ECS standards; This will likely be just in the camera system
+        public static void UpdateProjectionMatrix(ref Camera cam) //TODO: make this its own system to follow ECS standards; This will likely be just in the camera system
         {
-            float aspect = AspectRatio;
-            float tanHalfFov = MathF.Tan(Fov / 2.0f);
-            float planeDiff = FarPlane - NearPlane;
+            float aspect = cam.AspectRatio;
+            float tanHalfFov = MathF.Tan(cam.Fov / 2.0f);
+            float planeDiff = cam.FarPlane - cam.NearPlane;
 
-            ProjectionMatrix = new Matrix4X4<float>
+            cam.ProjectionMatrix = new Matrix4X4<float>
             {
                 M11 = 1.0f / (aspect * tanHalfFov),
                 M12 = 0.0f,
@@ -36,12 +36,12 @@ namespace Senjata.Essentials.Components
 
                 M31 = 0.0f,
                 M32 = 0.0f,
-                M33 = -(FarPlane + NearPlane) / planeDiff,
+                M33 = -(cam.FarPlane + cam.NearPlane) / planeDiff,
                 M34 = -1.0f,
 
                 M41 = 0.0f,
                 M42 = 0.0f,
-                M43 = -(2.0f * FarPlane * NearPlane) / planeDiff,
+                M43 = -(2.0f * cam.FarPlane * cam.NearPlane) / planeDiff,
                 M44 = 0.0f,
             };
         }
