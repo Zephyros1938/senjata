@@ -38,7 +38,6 @@ namespace Senjata
 
             window.Dispose();
         }
-
         private static void OnLoad()
         {
             Debug.Timer loadTime = new Debug.Timer();
@@ -187,28 +186,32 @@ namespace Senjata
                 typeof(ClientCamera)
             )[0];
 
+            var ClientCameraSettings = ClientCamera.GetStorage<Transform3D>();
             if (keyboardManager.IsDown(Key.Number1))
             {
                 Console.WriteLine(
-                    $"Camera Pos: {ClientCamera.GetStorage<Transform3D>()?[0].Position}"
+                    $"Camera Pos: {ClientCameraSettings?[0].Position}\nCamera Rot: {ClientCameraSettings?[0].Rotation}"
                 );
             }
 
-            if (keyboardManager.IsHeld(Key.S))
+            if (keyboardManager.IsHeld(Key.S) || keyboardManager.IsHeld(Key.W))
             {
-                ClientCamera.GetStorage<Transform3D>()?[0].Position.Z += 1 * (float)deltaTime;
+                int movedir = Util.MoveUtil.boolCal(keyboardManager.IsHeld(Key.S), keyboardManager.IsHeld(Key.W));
+                ClientCameraSettings?[0].Position.Y += MathF.Sin(-ClientCameraSettings?[0].Rotation.X ?? 0) * movedir * (float)deltaTime;
+                ClientCameraSettings?[0].Position.X += MathF.Cos(-ClientCameraSettings?[0].Rotation.X ?? 0) * MathF.Sin(ClientCameraSettings?[0].Rotation.Y ?? 0) * movedir * (float)deltaTime;
+                ClientCameraSettings?[0].Position.Z += MathF.Cos(-ClientCameraSettings?[0].Rotation.X ?? 0) * MathF.Cos(ClientCameraSettings?[0].Rotation.Y ?? 0) * movedir * (float)deltaTime;
             }
-            if (keyboardManager.IsHeld(Key.W))
+            if (keyboardManager.IsHeld(Key.A) || keyboardManager.IsHeld(Key.D))
             {
-                ClientCamera.GetStorage<Transform3D>()?[0].Position.Z -= 1 * (float)deltaTime;
+                // TODO: THIS thing
             }
-            if (keyboardManager.IsHeld(Key.A))
+            if (keyboardManager.IsHeld(Key.Left) || keyboardManager.IsHeld(Key.Right))
             {
-                ClientCamera.GetStorage<Transform3D>()?[0].Position.X -= 1 * (float)deltaTime;
+                ClientCameraSettings?[0].Rotation.Y += Util.MoveUtil.boolCal(keyboardManager.IsHeld(Key.Left), keyboardManager.IsHeld(Key.Right)) * (float)deltaTime;
             }
-            if (keyboardManager.IsHeld(Key.D))
+            if (keyboardManager.IsHeld(Key.Up) || keyboardManager.IsHeld(Key.Down))
             {
-                ClientCamera.GetStorage<Transform3D>()?[0].Position.X += 1 * (float)deltaTime;
+                ClientCameraSettings?[0].Rotation.X += Util.MoveUtil.boolCal(keyboardManager.IsHeld(Key.Up), keyboardManager.IsHeld(Key.Down)) * (float)deltaTime;
             }
         }
 
