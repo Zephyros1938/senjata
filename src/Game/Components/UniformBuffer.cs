@@ -5,10 +5,16 @@ using Silk.NET.OpenGL;
 
 namespace Senjata.Essentials.Components
 {
+    [StructLayout(LayoutKind.Explicit)]
     public struct UniformBuffer(uint handle, uint bindingPoint, nuint sizeInBytes) : IComponent
     {
+        [FieldOffset(0)]
         public uint Handle = handle;
+
+        [FieldOffset(4)]
         public uint BindingPoint = bindingPoint;
+
+        [FieldOffset(8)]
         public nuint SizeInBytes = sizeInBytes;
 
         public static UniformBuffer Create<T>(

@@ -1,20 +1,32 @@
+using System.Runtime.InteropServices;
 using Senjata.ECS;
 using Silk.NET.Maths;
 
 namespace Senjata.Essentials.Components
 {
+    [StructLayout(LayoutKind.Explicit)]
     struct Camera : IComponent
     {
+        [FieldOffset(0)]
         public float Fov;
-        public Vector2D<float> ViewportSize;
+
+        [FieldOffset(4)]
         public float NearPlane;
+
+        [FieldOffset(8)]
         public float FarPlane;
+
+        [FieldOffset(12)]
+        public bool ProjectionMatrixDirty;
+
+        [FieldOffset(16)]
+        public Matrix4X4<float> ProjectionMatrix;
+
+        [FieldOffset(80)]
+        public Vector2D<float> ViewportSize;
 
         public readonly float AspectRatio =>
             ViewportSize.Y > 0 ? ViewportSize.X / ViewportSize.Y : 16f / 9f; // I love +Infinity
-
-        public Matrix4X4<float> ProjectionMatrix;
-        public bool ProjectionMatrixDirty;
 
         public static void UpdateProjectionMatrix(ref Camera cam) //TODO: make this its own system to follow ECS standards; This will likely be just in the camera system
         {

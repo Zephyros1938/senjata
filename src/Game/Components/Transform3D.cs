@@ -1,10 +1,27 @@
+using System.Runtime.InteropServices;
 using Senjata.ECS;
 using Silk.NET.Maths;
 
 namespace Senjata.Essentials.Components
 {
-    struct Transform3D : IComponent
+    [StructLayout(LayoutKind.Explicit, Size = 101)]
+    public struct Transform3D : IComponent
     {
+        [FieldOffset(0)]
+        public Matrix4X4<float> WorldMatrix;
+
+        [FieldOffset(64)]
+        public Vector3D<float> Position;
+
+        [FieldOffset(76)]
+        public Vector3D<float> Rotation;
+
+        [FieldOffset(88)]
+        public Vector3D<float> Scale;
+
+        [FieldOffset(100)]
+        public bool IsDirty = true;
+
         public Transform3D(
             Vector3D<float> position,
             Vector3D<float> rotation,
@@ -16,7 +33,7 @@ namespace Senjata.Essentials.Components
             Rotation = rotation;
             Scale = scale;
             IsDirty = isDirty;
-            WorldMatrix = new Matrix4X4<float>(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+            WorldMatrix = Matrix4X4<float>.Identity;
         }
 
         public static readonly Transform3D Identity = new(
@@ -25,13 +42,6 @@ namespace Senjata.Essentials.Components
             new Vector3D<float>(1, 1, 1),
             true
         );
-
-        public Vector3D<float> Position;
-        public Vector3D<float> Rotation;
-        public Vector3D<float> Scale;
-
-        public bool IsDirty = true;
-        public Matrix4X4<float> WorldMatrix;
 
         public override readonly string ToString() => $"({Position},{Rotation},{Scale})";
     }
