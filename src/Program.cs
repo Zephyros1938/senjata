@@ -14,6 +14,7 @@ namespace Senjata
         private static IInputContext? input;
         private static readonly ECS.Scene? scene = Essentials.WorldHelper.CreateWorld();
         private static readonly KeyboardManager keyboardManager = new();
+        private static readonly MouseManager mouseManager = new();
 
         static void Main(string[] args)
         {
@@ -51,6 +52,12 @@ namespace Senjata
             {
                 keyboard.KeyDown += keyboardManager.OnKeyDown;
                 keyboard.KeyUp += keyboardManager.OnKeyUp;
+            }
+            foreach (var mouse in input.Mice)
+            {
+                mouse.MouseDown += mouseManager.OnMouseDown;
+                mouse.MouseUp += mouseManager.OnMouseUp;
+                mouse.MouseMove += mouseManager.OnMouseMove;
             }
 
             gl.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -175,6 +182,7 @@ namespace Senjata
         private static void OnUpdate(double deltaTime)
         {
             keyboardManager.Update();
+            mouseManager.Update();
             Essentials.Systems.UpdateCameras(scene, gl);
 
             if (keyboardManager.IsHeld(Key.Escape))

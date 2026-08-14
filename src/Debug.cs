@@ -3,6 +3,7 @@ namespace Senjata
     public static class Debug
     {
         public static bool debugKeyboard = false;
+        public static bool debugMouse = true;
         public static bool debugGl = true;
         public static bool debugTimes = true;
 

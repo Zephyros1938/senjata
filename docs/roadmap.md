@@ -18,7 +18,7 @@
 
 ## Input & Utils for game Engine
 
-- [ ] Mouse input support
+- [x] Mouse input support
 - [ ] Deltatime smoothing & fixed timestep for the update loop
 - [ ] Resource Manager / Asset Cache (Shader, Texture, Mesh)
 - [ ] Log system
