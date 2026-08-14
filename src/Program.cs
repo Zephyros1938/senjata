@@ -183,7 +183,7 @@ namespace Senjata
         {
             keyboardManager.Update();
             mouseManager.Update();
-            Essentials.Systems.UpdateCameras(scene, gl);
+            Essentials.Systems.UpdateCameras(scene, gl, mouseManager.Delta, (float)deltaTime);
 
             if (keyboardManager.IsHeld(Key.Escape))
             {

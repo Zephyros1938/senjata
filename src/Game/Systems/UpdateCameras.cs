@@ -1,3 +1,4 @@
+using System;
 using Silk.NET.Maths;
 
 namespace Senjata.Essentials
@@ -7,7 +8,12 @@ namespace Senjata.Essentials
 
     public static partial class Systems
     {
-        public static void UpdateCameras(ECS.Scene scene, GL gl)
+        public static void UpdateCameras(
+            ECS.Scene scene,
+            GL gl,
+            Vector2D<float> mouseDelta,
+            float deltaTime
+        )
         {
             var cameraGroups = scene.Query(
                 typeof(Transform3D),
@@ -45,13 +51,29 @@ namespace Senjata.Essentials
                     ref Transform3D transform = ref transforms[i];
                     ref Camera camera = ref cameras[i];
 
+                    if (mouseDelta != Vector2D<float>.Zero)
+                    {
+                        const float sensitivity = 0.002f;
+
+                        transform.Rotation.X -= mouseDelta.Y * sensitivity;
+
+                        transform.Rotation.Y -= mouseDelta.X * sensitivity;
+
+                        float maxPitch = Scalar.DegreesToRadians(89.0f);
+                        transform.Rotation.X = Math.Clamp(
+                            transform.Rotation.X,
+                            -maxPitch,
+                            maxPitch
+                        );
+                    }
+
                     Matrix4X4<float> rotation =
                         Matrix4X4.CreateRotationX(transform.Rotation.X)
                         * Matrix4X4.CreateRotationY(transform.Rotation.Y)
                         * Matrix4X4.CreateRotationZ(transform.Rotation.Z);
 
                     Matrix4X4<float> translation = Matrix4X4.CreateTranslation(transform.Position);
-                    Matrix4X4<float> worldMatrix = translation * rotation;
+                    Matrix4X4<float> worldMatrix = rotation * translation;
 
                     if (Matrix4X4.Invert(worldMatrix, out Matrix4X4<float> view))
                     {

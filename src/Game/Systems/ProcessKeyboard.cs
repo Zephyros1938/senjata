@@ -1,8 +1,10 @@
 namespace Senjata.Essentials
 {
+    using System;
     using Components;
     using Senjata.ECS;
     using Silk.NET.Input;
+    using Silk.NET.Maths;
 
     public static partial class Systems
     {
@@ -32,14 +34,42 @@ namespace Senjata.Essentials
 
             float speed = 2.0f * (float)deltaTime;
 
-            if (keyboardManager.IsHeld(Key.S))
-                transform.Position.Z += speed;
+            float pitch = transform.Rotation.X;
+            float yaw = transform.Rotation.Y;
+
+            Vector3D<float> forward = Vector3D.Normalize(
+                new Vector3D<float>(
+                    MathF.Sin(yaw) * MathF.Cos(pitch),
+                    MathF.Sin(pitch),
+                    MathF.Cos(yaw) * MathF.Cos(pitch)
+                )
+            );
+
+            Vector3D<float> right = Vector3D.Normalize(
+                Vector3D.Cross(forward, new Vector3D<float>(0, 1, 0))
+            );
+
+            Vector3D<float> moveDir = Vector3D<float>.Zero;
+
             if (keyboardManager.IsHeld(Key.W))
-                transform.Position.Z -= speed;
+                moveDir -= forward; // Move along look direction
+            if (keyboardManager.IsHeld(Key.S))
+                moveDir += forward;
             if (keyboardManager.IsHeld(Key.A))
-                transform.Position.X -= speed;
+                moveDir += right; // Strafe left
             if (keyboardManager.IsHeld(Key.D))
-                transform.Position.X += speed;
+                moveDir -= right; // Strafe right
+
+            if (keyboardManager.IsHeld(Key.Space))
+                moveDir.Y += 1.0f;
+            if (keyboardManager.IsHeld(Key.ShiftLeft))
+                moveDir.Y -= 1.0f;
+
+            if (moveDir != Vector3D<float>.Zero)
+            {
+                moveDir = Vector3D.Normalize(moveDir);
+                transform.Position += moveDir * speed;
+            }
 
             if (keyboardManager.IsHeld(Key.I))
             {

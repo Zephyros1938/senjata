@@ -3,13 +3,13 @@ namespace Senjata
     public static class Debug
     {
         public static bool debugKeyboard = false;
-        public static bool debugMouse = true;
+        public static bool debugMouse = false;
         public static bool debugGl = true;
         public static bool debugTimes = true;
 
         public class Timer
         {
-            System.Diagnostics.Stopwatch stopwatch;
+            readonly System.Diagnostics.Stopwatch stopwatch;
 
             public Timer()
             {
